@@ -2,456 +2,68 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HealthInsight Pro - Professional Medical Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Aplikasi</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
     
     <style>
-        :root {
-            --bg-color: #f2f2f7;
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --primary-accent: #007AFF;
-            --text-main: #1c1c1e;
-            --success: #34C759;
-            --warning: #FFCC00;
-            --danger: #FF3B30;
-            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f2f5;
+            display: flex; flex-direction: column;
         }
-
-        [data-theme="dark"] {
-            --bg-color: #000000;
-            --glass-bg: rgba(28, 28, 30, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #ffffff;
-            --primary-accent: #0A84FF;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column; min-height: 100vh;
-            transition: all 0.3s ease;
-        }
-
-        header {
-            padding: 15px 20px;
-            backdrop-filter: blur(15px);
-            position: sticky; top: 0; z-index: 100;
-            background: var(--glass-bg);
-            border-bottom: 1px solid var(--glass-border);
+        nav {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
             display: flex; justify-content: space-between; align-items: center;
+            z-index: 10;
         }
-
-        .container { max-width: 500px; margin: 10px auto; padding: 15px; width: 100%; }
-
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px; padding: 20px;
-            box-shadow: var(--card-shadow); margin-bottom: 15px;
+        .logo a { text-decoration: none; color: #333; font-size: 20px; font-weight: bold; }
+        nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; gap: 15px; }
+        nav a.btn {
+            color: white; text-decoration: none; font-size: 15px;
+            font-weight: 600; padding: 10px 20px; border-radius: 8px;
+            transition: all 0.3s ease; display: inline-block;
         }
-
-        .user-nav { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .user-pill {
-            padding: 8px 16px; border-radius: 20px; background: var(--glass-bg);
-            border: 1px solid var(--glass-border); cursor: pointer; white-space: nowrap;
-            font-size: 0.85em; font-weight: 600; transition: 0.2s;
-        }
-        .user-pill.active { background: var(--primary-accent); color: white; border-color: var(--primary-accent); }
-
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-box { padding: 12px; border-radius: 18px; background: rgba(120, 120, 128, 0.08); text-align: center; }
-        .stat-value { font-size: 1.2em; font-weight: 800; display: block; }
-        .stat-label { font-size: 0.65em; opacity: 0.6; text-transform: uppercase; }
-
-        input, select {
-            width: 100%; padding: 12px; border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            background: rgba(120, 120, 128, 0.1);
-            color: var(--text-main); font-size: 15px; margin: 5px 0; outline: none;
-        }
-
-        .btn-primary {
-            width: 100%; padding: 16px; border-radius: 16px; border: none;
-            background: var(--primary-accent); color: white;
-            font-weight: 700; cursor: pointer; margin-top: 10px;
-        }
-
-        .history-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid var(--glass-border);
-        }
-
-        .chart-container { height: 250px; margin: 15px 0; }
-        
-        .filter-tabs { display: flex; background: rgba(120, 120, 128, 0.12); border-radius: 12px; padding: 4px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; border: none; background: none; padding: 8px; font-size: 0.8em; font-weight: 600; cursor: pointer; border-radius: 10px; color: var(--text-main); }
-        .tab-btn.active { background: white; color: var(--primary-accent); }
-
-        .warning-banner {
-            background: var(--danger); color: white; padding: 10px;
-            border-radius: 12px; font-size: 0.8em; margin-bottom: 15px;
-            display: none; animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
-        footer { text-align: center; padding: 20px; font-size: 0.8em; opacity: 0.5; }
+        .app-link-1 { background-color: #28a745; }
+        .app-link-1:hover { background-color: #218838; }
+        .app-link-2 { background-color: #007bff; }
+        .app-link-2:hover { background-color: #0069d9; }
+        .main-content { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; background-color: #ffffff; }
+        .welcome-msg { position: absolute; text-align: center; padding: 20px; pointer-events: none; }
     </style>
-
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="manifest.json?v=1777365211026">
-    <link rel="apple-touch-icon" href="icon-192.png">
 </head>
-<body data-theme="light">
+<body>
 
-<header>
-    <div style="font-weight: 800; font-size: 1.1em;">HEALTH<span style="color:var(--primary-accent)">INSIGHT</span> PRO</div>
-    <div onclick="toggleTheme()" style="cursor:pointer"><i class="fas fa-moon" id="theme-icon"></i></div>
-</header>
+    <nav>
+        <div class="logo"><a href="index.html"> HomePortal</a></div>
+        <ul>
+            <li><a href="https://username.github.io/aplikasi-satu" target="konten-aplikasi" class="btn app-link-1"> Aplikasi 1</a></li>
+            <li><a href="https://pkmsampanahan.github.io/betaa/" target="konten-aplikasi" class="btn app-link-2"> STBM</a></li>
+        </ul>
+    </nav>
 
-<div class="container">
-    <div id="trendWarning" class="warning-banner">
-        <i class="fas fa-exclamation-triangle"></i> PERINGATAN: Gula darah Anda naik 3x berturut-turut!
-    </div>
-
-    <div class="user-nav" id="userList">
-        <div class="user-pill active" onclick="switchUser('Ayah')">Ayah</div>
-        <div class="user-pill" onclick="switchUser('Ibu')">Ibu</div>
-        <div class="user-pill" onclick="switchUser('Anak')">Anak</div>
-    </div>
-
-    <div class="glass-card">
-        <h4 style="margin:0 0 10px 0"><i class="fas fa-user-medical"></i> Data Pasien: <span id="activeUserLabel">Ayah</span></h4>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-            <input type="text" id="profNama" placeholder="Nama Lengkap">
-            <input type="number" id="profUmur" placeholder="Umur">
-            <input type="number" id="profBerat" placeholder="BB (kg)">
-            <input type="number" id="profTinggi" placeholder="TB (cm)">
-        </div>
-        <button onclick="saveProfile()" class="btn-primary" style="padding:10px; font-size:0.8em; background:#8e8e93">Simpan Data</button>
-    </div>
-
-    <div class="filter-tabs">
-        <button class="tab-btn active" onclick="setFilter('all', this)">Semua</button>
-        <button class="tab-btn" onclick="setFilter('today', this)">Hari Ini</button>
-        <button class="tab-btn" onclick="setFilter('week', this)">7 Hari</button>
-    </div>
-
-    <div class="stat-grid">
-        <div class="stat-box">
-            <span class="stat-label">Rata-rata (7 Hari)</span>
-            <span class="stat-value" id="avg7Day">0</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-label">Estimasi Minggu Depan</span>
-            <span class="stat-value" id="estNextWeek">0</span>
+    <div class="main-content">
+        <iframe name="konten-aplikasi" src="about:blank"></iframe>
+        <div class="welcome-msg">
+            <h2>Portal Aplikasi Siap</h2>
+            <p>Silakan klik menu di atas untuk memuat aplikasi di dalam halaman ini.</p>
         </div>
     </div>
-
-    <div class="glass-card">
-        <h3 style="margin-top:0"><i class="fas fa-syringe" style="color:var(--danger)"></i> Input Medis</h3>
-        <select id="jenisTes">
-            <option value="GDP">Puasa (GDP)</option>
-            <option value="GDS" selected>Sewaktu (GDS)</option>
-            <option value="GD2PP">2 Jam PP</option>
-        </select>
-        <input type="number" id="angka" placeholder="Hasil (mg/dL)">
-        <button onclick="cekGula()" class="btn-primary">Simpan & Analisis AI</button>
-        
-        <div id="hasil" style="display:none; margin-top:15px; padding:15px; border-radius:15px;">
-            <div id="statusTeks" style="font-weight:900; font-size:1.2em;"></div>
-            <div id="smartInsight" style="font-size:0.85em; margin-top:5px;"></div>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <h3 style="margin:0"><i class="fas fa-database"></i> Backup & Sync</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-            <button onclick="exportBackup()" style="background:var(--success); color:white; border:none; padding:10px; border-radius:12px; cursor:pointer"><i class="fas fa-file-export"></i> Export JSON</button>
-            <button onclick="document.getElementById('importFile').click()" style="background:var(--primary-accent); color:white; border:none; padding:10px; border-radius:12px; cursor:pointer"><i class="fas fa-file-import"></i> Import JSON</button>
-            <input type="file" id="importFile" hidden accept=".json" onchange="importBackup(event)">
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <h3 style="margin:0">Tren Grafik Kesehatan</h3>
-        <div class="chart-container">
-            <canvas id="healthChart"></canvas>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <h3 style="margin:0">Laporan & Riwayat</h3>
-        <div class="history-list" id="historyLog"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
-            <button onclick="generatePDF()" style="background:var(--danger); color:white; border:none; padding:12px; border-radius:12px; font-weight:bold; cursor:pointer"><i class="fas fa-file-pdf"></i> PDF Premium</button>
-            <button onclick="exportPNG()" style="background:rgba(120,120,128,0.2); color:var(--text-main); border:none; padding:12px; border-radius:12px; cursor:pointer"><i class="fas fa-image"></i> PNG</button>
-        </div>
-    </div>
-</div>
-
-<footer>it.barokah.net &copy; 2026 - Medical Dashboard V6</footer>
-
-<audio id="alarmSound" src="https://assets.mixkit.co/active_storage/sfx/1011/1011-preview.mp3" preload="auto"></audio>
-
-<script>
-    let activeUser = 'Ayah';
-    let currentFilter = 'all';
-    let myChart;
-
-    // 1. MULTI-USER & PROFILE
-    function switchUser(user) {
-        activeUser = user;
-        document.querySelectorAll('.user-pill').forEach(p => {
-            p.classList.toggle('active', p.innerText === user);
-        });
-        document.getElementById('activeUserLabel').innerText = user;
-        loadProfile();
-        refreshUI();
-    }
-
-    function saveProfile() {
-        const profile = {
-            nama: document.getElementById('profNama').value,
-            umur: document.getElementById('profUmur').value,
-            berat: document.getElementById('profBerat').value,
-            tinggi: document.getElementById('profTinggi').value
-        };
-        localStorage.setItem(`profile_${activeUser}`, JSON.stringify(profile));
-        alert('Data ' + activeUser + ' berhasil disimpan!');
-    }
-
-    function loadProfile() {
-        const prof = JSON.parse(localStorage.getItem(`profile_${activeUser}`) || '{}');
-        document.getElementById('profNama').value = prof.nama || '';
-        document.getElementById('profUmur').value = prof.umur || '';
-        document.getElementById('profBerat').value = prof.berat || '';
-        document.getElementById('profTinggi').value = prof.tinggi || '';
-    }
-
-    // 2. ANALISIS MEDIS CERDAS
-    function cekGula() {
-        const nilai = parseFloat(document.getElementById('angka').value);
-        const jenis = document.getElementById('jenisTes').value;
-        if (!nilai) return;
-
-        let status = "", warna = "", insight = "";
-
-        if (jenis === "GDP") {
-            if (nilai < 100) { status = "Normal"; warna = "var(--success)"; insight = "Target tercapai. Pertahankan pola makan."; }
-            else if (nilai < 126) { status = "Pre-Diabetes"; warna = "var(--warning)"; insight = "Peringatan: Gula puasa mulai meningkat."; }
-            else { status = "Tinggi"; warna = "var(--danger)"; insight = "Nilai tinggi. Batasi asupan gula segera."; }
-        } else {
-            const limit = (jenis === "GDS") ? 140 : 180;
-            if (nilai < limit) { status = "Normal"; warna = "var(--success)"; insight = "Kondisi stabil."; }
-            else if (nilai < 200) { status = "Pre-Diabetes"; warna = "var(--warning)"; insight = "Waspada ambang batas."; }
-            else { status = "Tinggi"; warna = "var(--danger)"; insight = "Risiko komplikasi. Cek faskes!"; }
-        }
-
-        document.getElementById('hasil').style.display = "block";
-        document.getElementById('hasil').style.backgroundColor = warna + "15";
-        document.getElementById('statusTeks').innerText = status;
-        document.getElementById('statusTeks').style.color = warna;
-        document.getElementById('smartInsight').innerText = insight;
-
-        saveData(nilai, status, jenis);
-    }
-
-    function saveData(nilai, status, jenis) {
-        const key = `data_${activeUser}`;
-        const data = JSON.parse(localStorage.getItem(key) || '[]');
-        data.push({
-            nilai, status, jenis,
-            timestamp: Date.now(),
-            tgl: new Date().toLocaleDateString('id-ID'),
-            jam: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
-        });
-        localStorage.setItem(key, JSON.stringify(data));
-        refreshUI();
-    }
-
-    // 3. LOGIKA TREND & ESTIMASI
-    function refreshUI() {
-        const data = JSON.parse(localStorage.getItem(`data_${activeUser}`) || '[]');
-        const now = Date.now();
-        
-        // Rata-rata 7 Hari
-        const weekData = data.filter(d => (now - d.timestamp) < 604800000);
-        const avg7 = weekData.length ? (weekData.reduce((a, b) => a + b.nilai, 0) / weekData.length).toFixed(1) : 0;
-        document.getElementById('avg7Day').innerText = avg7 + " mg/dL";
-
-        // Estimasi Minggu Depan (Simple Linear Projection)
-        if (weekData.length > 2) {
-            const lastVal = weekData[weekData.length - 1].nilai;
-            const firstVal = weekData[0].nilai;
-            const diff = (lastVal - firstVal) / weekData.length;
-            document.getElementById('estNextWeek').innerText = (parseFloat(lastVal) + diff).toFixed(1);
-        }
-
-        // Warning Trend Naik 3x Berturut
-        const warningDiv = document.getElementById('trendWarning');
-        if (data.length >= 3) {
-            const last3 = data.slice(-3);
-            if (last3[2].nilai > last3[1].nilai && last3[1].nilai > last3[0].nilai) {
-                warningDiv.style.display = "block";
-            } else {
-                warningDiv.style.display = "none";
-            }
-        }
-
-        const filtered = currentFilter === 'today' ? data.filter(d => (now - d.timestamp) < 86400000) : 
-                        currentFilter === 'week' ? weekData : data;
-
-        // Render History
-        const log = document.getElementById('historyLog');
-        log.innerHTML = [...filtered].reverse().map(i => `
-            <div class="history-item">
-                <div><b>${i.nilai}</b> <small>${i.jenis}</small><br><span style="font-size:0.7em; opacity:0.6">${i.tgl} ${i.jam}</span></div>
-                <div style="font-weight:700; color:${i.status === 'Normal' ? 'var(--success)' : 'var(--danger)'}">${i.status}</div>
-            </div>
-        `).join('');
-
-        initChart(filtered, avg7);
-    }
-
-    function initChart(dataList, avg) {
-        const ctx = document.getElementById('healthChart').getContext('2d');
-        if (myChart) myChart.destroy();
-        const labels = dataList.map(d => d.jam).slice(-10);
-        const values = dataList.map(d => d.nilai).slice(-10);
-
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Kadar Gula',
-                        data: values,
-                        borderColor: '#007AFF',
-                        borderWidth: 4, tension: 0.4, fill: false
-                    },
-                    {
-                        label: 'Avg Line',
-                        data: Array(values.length).fill(avg),
-                        borderColor: 'rgba(52, 199, 89, 0.4)',
-                        borderDash: [5, 5], pointRadius: 0, fill: false
-                    }
-                ]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-        });
-    }
-
-    // 4. PDF PREMIUM & DATA MANAGEMENT
-    async function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const prof = JSON.parse(localStorage.getItem(`profile_${activeUser}`) || '{}');
-        const data = JSON.parse(localStorage.getItem(`data_${activeUser}`) || '[]');
-
-        // Desain PDF
-        doc.setFontSize(22);
-        doc.setTextColor(0, 122, 255);
-        doc.text("LAPORAN MEDIS HEALTHINSIGHT", 20, 20);
-        
-        doc.setDrawColor(0, 122, 255);
-        doc.line(20, 25, 190, 25);
-
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Nama: ${prof.nama || activeUser}`, 20, 35);
-        doc.text(`Umur: ${prof.umur || '-'} Thn`, 20, 42);
-        doc.text(`Berat: ${prof.berat || '-'} kg | Tinggi: ${prof.tinggi || '-'} cm`, 20, 49);
-        doc.text(`Tanggal Laporan: ${new Date().toLocaleDateString('id-ID')}`, 20, 56);
-
-        doc.text("Ringkasan 10 Data Terakhir:", 20, 70);
-        let y = 80;
-        data.slice(-10).reverse().forEach((item, index) => {
-            doc.text(`${index + 1}. ${item.tgl} | ${item.nilai} mg/dL | ${item.jenis} | ${item.status}`, 20, y);
-            y += 7;
-        });
-
-        doc.save(`Laporan_${activeUser}_${Date.now()}.pdf`);
-    }
-
-    function exportBackup() {
-        const allData = {};
-        ['Ayah', 'Ibu', 'Anak'].forEach(u => {
-            allData[u] = {
-                profile: localStorage.getItem(`profile_${u}`),
-                history: localStorage.getItem(`data_${u}`)
-            };
-        });
-        const blob = new Blob([JSON.stringify(allData)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `HealthBackup_${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-    }
-
-    function importBackup(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = JSON.parse(e.target.result);
-            Object.keys(data).forEach(u => {
-                if(data[u].profile) localStorage.setItem(`profile_${u}`, data[u].profile);
-                if(data[u].history) localStorage.setItem(`data_${u}`, data[u].history);
-            });
-            alert("Data Berhasil di-Restore!");
-            location.reload();
-        };
-        reader.readAsText(file);
-    }
-
-    // UTILS
-    function setFilter(f, el) {
-        currentFilter = f;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-        refreshUI();
-    }
-
-    function toggleTheme() {
-        const body = document.body;
-        const isDark = body.getAttribute('data-theme') === 'dark';
-        body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        document.getElementById('theme-icon').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
-    }
-
-    function exportPNG() {
-        html2canvas(document.querySelector(".container")).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `Report_${activeUser}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        });
-    }
-
-    window.onload = () => { switchUser('Ayah'); };
-</script>
-
 
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=1777365211026');
-        });
-      }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker Portal Aktif'))
+                    .catch(err => console.error('Gagal mendaftarkan Service Worker:', err));
+            });
+        }
     </script>
 </body>
 </html>
