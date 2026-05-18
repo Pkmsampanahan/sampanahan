@@ -1,4 +1,4 @@
-const CACHE_NAME = 'portal-navigasi-v1';
+const CACHE_NAME = 'portal-navigasi-v2';
 
 // Cukup cache file portal utama saja
 const assets = [
