@@ -1,0 +1,22 @@
+{
+  "name": "Portal Aplikasi Petugas",
+  "short_name": "PortalApp",
+  "description": "Menu Navigasi Aplikasi Online dan Offline",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme-color": "#007bff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
