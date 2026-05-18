@@ -1,4 +1,5 @@
-const CACHE_NAME = 'portal-navigasi-v1';
+// JIKA ADA UPDATE PORTAL, GANTI NAMA CACHE DI BAWAH INI (Contoh: v1 jadi v2)
+const CACHE_NAME = 'portal-kesling-cache-v1.0.0';
 
 const assets = [
   'index.html',
@@ -7,35 +8,35 @@ const assets = [
   'icon-512.png'
 ];
 
-// Menyimpan aset portal utama ke memori cache
+// Pemasangan cache awal
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      // Menggunakan return agar memastikan semua aset ter-cache sebelum install selesai
       return cache.addAll(assets);
     })
   );
   self.skipWaiting();
 });
 
-// Membersihkan cache lama
+// Pembersihan cache versi lama secara otomatis
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
+            console.log('Menghapus cache lawas:', key);
             return caches.delete(key);
           }
         })
       );
     })
   );
+  return self.clients.claim();
 });
 
-// Strategi: Network First, Fallback to Cache
+// Strategi Pengambilan Data
 self.addEventListener('fetch', e => {
-  // Hanya tangani request dengan skema http/https (menghindari error chrome-extension)
   if (!e.request.url.startsWith('http')) return;
 
   e.respondWith(
