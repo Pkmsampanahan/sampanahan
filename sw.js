@@ -1,25 +1,24 @@
-const CACHE_NAME = 'portal-navigasi-v2';
+const CACHE_NAME = 'portal-navigasi-v1';
 
-// Cukup cache file portal utama saja
 const assets = [
-  '/',
   'index.html',
   'manifest.json',
   'icon-192.png',
   'icon-512.png'
 ];
 
-// Menyimpan aset portal utama ke memory
+// Menyimpan aset portal utama ke memori cache
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
+      // Menggunakan return agar memastikan semua aset ter-cache sebelum install selesai
       return cache.addAll(assets);
     })
   );
   self.skipWaiting();
 });
 
-// Membersihkan cache lama jika ada pembaruan
+// Membersihkan cache lama
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => {
@@ -35,9 +34,14 @@ self.addEventListener('activate', e => {
 });
 
 // Strategi: Network First, Fallback to Cache
-// Mencoba mengambil data online, jika offline baru ambil dari cache lokal
 self.addEventListener('fetch', e => {
+  // Hanya tangani request dengan skema http/https (menghindari error chrome-extension)
+  if (!e.request.url.startsWith('http')) return;
+
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(e.request)
+      .catch(() => {
+        return caches.match(e.request);
+      })
   );
 });
