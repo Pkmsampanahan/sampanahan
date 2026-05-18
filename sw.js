@@ -1,5 +1,5 @@
 // JIKA ADA UPDATE PORTAL, GANTI NAMA CACHE DI BAWAH INI (Contoh: v1 jadi v2)
-const CACHE_NAME = 'portal-kesling-cache-v1.0.0';
+const CACHE_NAME = 'portal-kesling-cache-v2.0.0';
 
 const assets = [
   'index.html',
