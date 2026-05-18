@@ -14,10 +14,9 @@
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             background-color: #f0f2f5;
             display: flex; flex-direction: column;
-            overflow: hidden; /* Mencegah double scrollbar pada portal */
+            overflow: hidden;
         }
         
-        /* Navigasi Utama */
         nav {
             background-color: #ffffff;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -25,24 +24,17 @@
             display: flex; justify-content: space-between; align-items: center;
             z-index: 10;
         }
-        .logo a { 
-            text-decoration: none; 
-            color: #333; 
-            font-size: 20px; 
-            font-weight: bold; 
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .logo-container { display: flex; flex-direction: column; }
+        .logo a { text-decoration: none; color: #333; font-size: 20px; font-weight: bold; }
+        .app-version { font-size: 11px; color: #888; margin-top: 2px; }
+        
         nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; gap: 15px; }
         
-        /* Tombol Navigasi */
         nav a.btn {
             color: white; text-decoration: none; font-size: 15px;
             font-weight: 600; padding: 10px 20px; border-radius: 8px;
             transition: all 0.2s ease; display: inline-block;
-            cursor: pointer;
-            border: none;
+            cursor: pointer; border: none;
         }
         .app-link-1 { background-color: #28a745; }
         .app-link-1:hover { background-color: #218838; }
@@ -50,57 +42,39 @@
         .app-link-2 { background-color: #007bff; }
         .app-link-2:hover { background-color: #0069d9; }
         
-        /* Penanda Tombol Aktif */
         nav ul li a.btn.active {
             background-color: #343a40 !important;
             box-shadow: inset 0 3px 5px rgba(0,0,0,0.3);
             transform: scale(0.96);
         }
 
-        /* Konten Utama & Iframe */
         .main-content { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background-color: #ffffff; display: none; }
         
-        /* Layar Selamat Datang */
         .welcome-msg { 
-            text-align: center; 
-            padding: 30px; 
-            max-width: 500px;
-            background: white;
-            border-radius: 12px;
+            text-align: center; padding: 30px; max-width: 500px;
+            background: white; border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         .welcome-msg h2 { color: #333; margin-top: 0; }
         .welcome-msg p { color: #666; font-size: 15px; line-height: 1.5; }
 
-        /* Responsif Layar HP (Mobile Friendly) */
         @media (max-width: 600px) {
-            nav {
-                flex-direction: column;
-                gap: 12px;
-                padding: 12px;
-            }
-            nav ul {
-                width: 100%;
-                justify-content: space-between;
-            }
-            nav ul li {
-                flex: 1;
-                text-align: center;
-            }
-            nav a.btn {
-                padding: 10px 5px;
-                font-size: 14px;
-                display: block;
-                margin: 0 4px;
-            }
+            nav { flex-direction: column; gap: 12px; padding: 12px; text-align: center; }
+            .logo-container { align-items: center; }
+            nav ul { width: 100%; justify-content: space-between; }
+            nav ul li { flex: 1; text-align: center; }
+            nav a.btn { padding: 10px 5px; font-size: 14px; display: block; margin: 0 4px; }
         }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo"><a href="index.html">🏥 Portal Kesling</a></div>
+        <div class="logo-container">
+            <div class="logo"><a href="index.html">🏥 Portal Kesling</a></div>
+            <div class="app-version">Versi 1.0.0</div>
+        </div>
         <ul>
             <li><a href="https://username.github.io/aplikasi-satu" target="konten-aplikasi" class="btn app-link-1" onclick="bukaAplikasi(this)">📊 PHBS</a></li>
             <li><a href="https://pkmsampanahan.github.io/betaa/" target="konten-aplikasi" class="btn app-link-2" onclick="bukaAplikasi(this)">💦 STBM</a></li>
@@ -111,6 +85,7 @@
         <div class="welcome-msg" id="welcomeBox">
             <h2>Portal Aplikasi Sanitarian</h2>
             <p>Silakan pilih menu <b>PHBS</b> atau <b>STBM</b> di atas untuk mulai menginput data lapangan atau melihat dashboard laporan.</p>
+            <p style="font-size: 12px; color: #bbb; margin-top: 20px;">Portal v1.0.0</p>
         </div>
         
         <iframe name="konten-aplikasi" id="iframeKonten" src="about:blank"></iframe>
@@ -118,23 +93,36 @@
 
     <script>
         function bukaAplikasi(elemen) {
-            // 1. Sembunyikan welcome message dan tampilkan iframe
             document.getElementById('welcomeBox').style.display = 'none';
             document.getElementById('iframeKonten').style.display = 'block';
             
-            // 2. Atur efek tombol aktif
             document.querySelectorAll('nav ul li a.btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             elemen.classList.add('active');
         }
 
-        // Registrasi Service Worker PWA Portal
+        // Jalankan Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker Portal Aktif'))
-                    .catch(err => console.error('Gagal mendaftarkan Service Worker:', err));
+                // Menambahkan query string parameter versi agar sw.js selalu ter-update di browser
+                navigator.serviceWorker.register('sw.js?v=1.0.0')
+                    .then(reg => {
+                        console.log('Service Worker Terdaftar');
+                        // Memeriksa jika ada pembaruan file sw.js
+                        reg.onupdatefound = () => {
+                            const installingWorker = reg.installing;
+                            installingWorker.onstatechange = () => {
+                                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Beritahu pengguna ada versi baru, disarankan reload
+                                    if (confirm('Versi baru tersedia! Muat ulang halaman sekarang?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            };
+                        };
+                    })
+                    .catch(err => console.error('Gagal:', err));
             });
         }
     </script>
